@@ -40,7 +40,7 @@ div.ganttview-hzheader-month {
 }
 
 div.ganttview-hzheader-day {
-	width: 20px;
+	width: 23px;
 	height: 20px;
 	border-right: 1px solid #f0f0f0;
 	border-top: 1px solid #d0d0d0;
@@ -90,7 +90,7 @@ div.ganttview-slide-container {
 /* Grid */
 
 div.ganttview-grid-row-cell {
-	width: 20px;
+	width: 23px;
 	height: 31px;
 	border-right: 1px solid #f0f0f0;
 	border-top: 1px solid #f0f0f0;
