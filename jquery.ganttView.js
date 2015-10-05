@@ -295,21 +295,27 @@ behavior: {
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < data[i].series.length; j++) {
                     var series = data[i].series[j];
-                    var size = DateUtils.daysBetween(series.start, series.end) + 1;
-					var offset = DateUtils.daysBetween(start, series.start);
+                    var size = DateUtils.daytimeBetween(series.start, series.end) + 1;
+					var offset = DateUtils.daytimeBetween(start, series.start);
+					
+					console.log(size); //!log
+		console.log(offset); //!log
 					var block = jQuery("<div>", {
                         "class": "ganttview-block",
                         "title": series.name + ", " + size + " days",
                         "css": {
-                            "width": ((size * cellWidth) - 9) + "px",
-                            "margin-left": ((offset * cellWidth) + 3) + "px"
+                            "width": ((size * cellWidth) - 3) + "px",
+                            "margin-left": ((offset * cellWidth)) + "px"
                         }
                     });
                     addBlockData(block, data[i], series);
                     if (data[i].series[j].color) {
                         block.css("background-color", data[i].series[j].color);
                     }
-                    block.append(jQuery("<div>", { "class": "ganttview-block-text" }).html(size+' Hrs'));
+                    
+                   // var numberOfDays = Math.round(size / cellWidth) - 1;
+					textdate = (size * 15) / 60 +' Hours';
+                    block.append(jQuery("<div>", { "class": "ganttview-block-text" }).html(textdate));
                     jQuery(rows[rowIdx]).append(block);
                     rowIdx = rowIdx + 1;
                 }
@@ -419,9 +425,10 @@ behavior: {
 
 			// Set new end date
         	var width = block.outerWidth();
-			var numberOfDays = Math.round(width / cellWidth) - 1;
-			block.data("block-data").end = newStart.clone().addDays(numberOfDays);
-			jQuery("div.ganttview-block-text", block).text(numberOfDays + 1);
+			var numberOfDays = Math.round(width / cellWidth);
+			block.data("block-data").end = newStart.clone().addMinutes(numberOfDays * 15);
+			textdate = (numberOfDays * 15) / 60 +' Hours';
+			jQuery("div.ganttview-block-text", block).text(textdate);
 
 			// Remove top and left properties to avoid incorrect block positioning,
         	// set position to relative to keep blocks relative to scrollbar when scrolling
@@ -459,13 +466,23 @@ behavior: {
 
             return count;
         },
+        daytimeBetween: function (start, end) {
+
+
+            if (!start || !end) { return 0; }
+            start = Date.parse(start); end = Date.parse(end);
+            if (start.getYear() == 1901 || end.getYear() == 8099) { return 0; }
+            var count = 0, date = start.clone();
+            while (date.compareTo(end) == -1) { count = count + 1; date.addMinutes(45); }
+
+            return count;
+        },
 
         isWeekend: function (date) {
             return date.getDay() % 6 == 0;
         },
 
 		getBoundaryDatesFromData: function (data, minDays) {
-			console.log('getBoundaryDatesFromData'); //!log
 
 			var minStart = new Date(); maxEnd = new Date();
 			for (var i = 0; i < data.length; i++) {
@@ -483,8 +500,6 @@ behavior: {
 			if (DateUtils.daysBetween(minStart, maxEnd) < minDays) {
 				//maxEnd = minStart.clone().addDays(minDays);
 			}
-			console.log(minStart); //!log
-			console.log(maxEnd); //!log
 			return [minStart, maxEnd];
 		}
     };
